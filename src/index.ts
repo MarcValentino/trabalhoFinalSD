@@ -1,34 +1,56 @@
-import { AppDataSource } from "./database/data-source"
-const express = require('express');
-const path = require('path');
+import { AppDataSource } from "./database/config/data-source"
+import { MP3View } from "./database/entity/MP3View";
+import express from 'express';
+import path from 'path';
 
-AppDataSource.initialize().then(async () => {
+AppDataSource
+    .initialize()
+    .then(() => {
+        console.log("Data Source has been initialized!")
+    })
+    .catch((err) => {
+        console.error("Error during Data Source initialization:", err)
+})
 
-    /*
-    console.log("Inserting a new user into the database...")
-    const user = new User()
-    user.firstName = "Timber"
-    user.lastName = "Saw"
-    user.age = 25
-    await AppDataSource.manager.save(user)
-    console.log("Saved a new user with id: " + user.id)
+const app = express();
+const port = 3000;
 
-    console.log("Loading users from the database...")
-    const users = await AppDataSource.manager.find(User)
-    console.log("Loaded users: ", users)
-    */
-    const app = express();
-    const port = 3000;
+// Serve static files from the 'public' directory
+app.use(express.static('public'));
 
-    // Serve static files from the 'public' directory
-    app.use(express.static('public'));
-    app.get('/stream-mp3', (req, res) => {
-        const mp3FilePath = path.join(__dirname, 'public', 'example.ogg');
+app.get('/get-all-mp3', async (req, res) => {
+    try {
+        const files = await AppDataSource.getRepository(MP3View).createQueryBuilder()
+            .select(['id', 'title', 'duration', 'artist_name', 'album_name'])
+            .distinct()
+            .execute();
+        
+        res.json({result: files});
+    } catch(error){
+        console.log("error: ", error);
+        res.status(500);
+    }
+})
+
+app.get('/stream-mp3/:mp3Id', async (req, res) => {
+    try {
+        const mp3Id = +req.params.mp3Id;
+        const file = await AppDataSource.getRepository(MP3View).findOne({
+        select: {
+            filepath: true
+        },
+        where: {
+            id: mp3Id,
+        }});
+        const mp3FilePath = path.join(__dirname, 'public', file.filepath);
         res.set('Content-Type', 'audio/ogg');
         res.sendFile(mp3FilePath);
-    });
-    app.listen(port, () => {
-        console.log(`Server is running on http://localhost:${port}`);
-    });
-      
-}).catch(error => console.log(error))
+    } catch(error) {
+        console.log("error", error);
+        res.status(500);
+    }
+});
+
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+});
