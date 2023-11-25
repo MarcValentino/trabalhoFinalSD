@@ -43,7 +43,7 @@ app.get('/stream-mp3/:mp3Id', async (req, res) => {
             id: mp3Id,
         }});
         const mp3FilePath = path.join(__dirname, 'public', file.filepath);
-        res.set('Content-Type', 'audio/ogg');
+        res.set('Content-Type', 'audio/mpeg');
         res.sendFile(mp3FilePath);
     } catch(error) {
         console.log("error", error);
