@@ -39,3 +39,12 @@ CREATE TABLE if not exists mp3_playlist (
     FOREIGN KEY (mp3_id) REFERENCES mp3_metadata(id),
     FOREIGN KEY (playlist_id) REFERENCES playlists(playlist_id)
 );
+
+create view mp3_view as
+select mm.*, a.artist_name, g.genre_name, a2.album_name  from artists a, albums a2, genres g, mp3_metadata mm 
+where mm.artist_id = a.artist_id and mm.genre_id = g.genre_id 
+and mm.album_id = a2.album_id;
+
+create view playlist_view as
+select p.*, mm.id as mp3_id from playlists p, mp3_playlist mp, mp3_metadata mm 
+where p.playlist_id = mp.playlist_id and mm.id = mp.mp3_id;
