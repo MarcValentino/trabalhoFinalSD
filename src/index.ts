@@ -2,11 +2,18 @@ import { AppDataSource } from "./database/config/data-source"
 import { MP3View } from "./database/entity/MP3View";
 import express from 'express';
 import path from 'path';
+import { readMp3FolderAndSaveToDB } from "./database/migration/readMusicFolder";
 
 AppDataSource
     .initialize()
-    .then(() => {
-        console.log("Data Source has been initialized!")
+    .then(async (connection) => {
+        console.log("Data Source initialized! Seeding database.")
+        try{
+            await readMp3FolderAndSaveToDB(path.join(__dirname, 'public'), connection);
+            console.log('seeding successful!');
+        } catch(error) {
+            console.log("seeding failed: ", error);
+        }
     })
     .catch((err) => {
         console.error("Error during Data Source initialization:", err)
@@ -42,7 +49,7 @@ app.get('/stream-mp3/:mp3Id', async (req, res) => {
         where: {
             id: mp3Id,
         }});
-        const mp3FilePath = path.join(__dirname, 'public', file.filepath);
+        const mp3FilePath = file.filepath;
         res.set('Content-Type', 'audio/mpeg');
         res.sendFile(mp3FilePath);
     } catch(error) {

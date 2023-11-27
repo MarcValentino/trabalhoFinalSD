@@ -5,6 +5,7 @@ import { ViewColumn, ViewEntity } from "typeorm"
     where mm.artist_id = a.artist_id and mm.genre_id = g.genre_id 
     and mm.album_id = a2.album_id;`
 })
+
 export class MP3View {
 
     @ViewColumn()
