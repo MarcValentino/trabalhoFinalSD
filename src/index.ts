@@ -7,8 +7,6 @@ initializeConnection().then(async connection => {
   const app = express();
   const port = 3000;
 
-  app.use(express.static('public'));
-
   app.get('/get-all-mp3', async (req, res) => {
     try {
       const files = await connection.getRepository(MP3View).createQueryBuilder()
