@@ -27,9 +27,9 @@ export async function readMp3FolderAndSaveToDB(folderPath: string, connection: D
       const metadata = await mm.parseFile(filePath, { duration: true });
 
       const mp3Metadata: Mp3Metadata = {
-        title: metadata.common.title,
-        artist: metadata.common.artist,
-        album: metadata.common.album,
+        title: metadata.common.title ? metadata.common.title : 'untitled',
+        artist: metadata.common.artist ? metadata.common.artist : 'unknown',
+        album: metadata.common.album ? metadata.common.album : 'unknown',
         genre: metadata.common.genre ? metadata.common.genre[0] : undefined,
         duration: Math.floor(metadata.format.duration),
         filepath: filePath,

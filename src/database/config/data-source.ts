@@ -8,7 +8,7 @@ import { MP3Metadata } from "../entity/MP3Metadata"
 
 export const AppDataSource = new DataSource({
     type: "postgres",
-    host: "localhost",
+    host: "postgres_db",
     port: 5432,
     username: "myuser",
     password: "mypassword",
