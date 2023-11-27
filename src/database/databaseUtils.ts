@@ -10,6 +10,7 @@ export async function initializeConnection() {
     try{
       console.log("Attempting to connect...");
       const connection = await AppDataSource.initialize();
+      console.log("Connection successful!");
       return connection;
     } catch(error){
       console.log("error connecting: ", error);

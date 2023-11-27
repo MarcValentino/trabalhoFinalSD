@@ -7,7 +7,6 @@ initializeConnection().then(async connection => {
   const app = express();
   const port = 3000;
 
-  // Serve static files from the 'public' directory
   app.use(express.static('public'));
 
   app.get('/get-all-mp3', async (req, res) => {
@@ -15,6 +14,7 @@ initializeConnection().then(async connection => {
       const files = await connection.getRepository(MP3View).createQueryBuilder()
         .select(['id', 'title', 'duration', 'artist_name', 'album_name'])
         .distinct()
+        .orderBy('id', 'ASC')
         .execute();
             
       res.json({result: files});

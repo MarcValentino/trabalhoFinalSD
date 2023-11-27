@@ -1,10 +1,6 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-import { MP3View } from "../entity/MP3View";
-import { Artist } from "../entity/Artist";
-import { Album } from "../entity/Album";
-import { Genre } from "../entity/Genre";
-import { MP3Metadata } from "../entity/MP3Metadata";
+import { MP3View, Artist, Album, Genre, MP3Metadata } from "../entity";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
