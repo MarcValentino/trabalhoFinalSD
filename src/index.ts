@@ -1,63 +1,49 @@
-import { AppDataSource } from "./database/config/data-source"
-import { MP3View } from "./database/entity/MP3View";
+import { MP3View } from "./database/entity";
 import express from 'express';
-import path from 'path';
-import { readMp3FolderAndSaveToDB } from "./database/migration/readMusicFolder";
+import { initializeConnection, seedDatabase } from "./database/databaseUtils";
 
-AppDataSource
-    .initialize()
-    .then(async (connection) => {
-        console.log("Data Source initialized! Seeding database.")
-        try{
-            await readMp3FolderAndSaveToDB(path.join(__dirname, 'public'), connection);
-            console.log('seeding successful!');
-        } catch(error) {
-            console.log("seeding failed: ", error);
-        }
-    })
-    .catch((err) => {
-        console.error("Error during Data Source initialization:", err)
-})
+initializeConnection().then(async connection => {
+  await seedDatabase(connection);
+  const app = express();
+  const port = 3000;
 
-const app = express();
-const port = 3000;
+  // Serve static files from the 'public' directory
+  app.use(express.static('public'));
 
-// Serve static files from the 'public' directory
-app.use(express.static('public'));
-
-app.get('/get-all-mp3', async (req, res) => {
+  app.get('/get-all-mp3', async (req, res) => {
     try {
-        const files = await AppDataSource.getRepository(MP3View).createQueryBuilder()
-            .select(['id', 'title', 'duration', 'artist_name', 'album_name'])
-            .distinct()
-            .execute();
-        
-        res.json({result: files});
+      const files = await connection.getRepository(MP3View).createQueryBuilder()
+        .select(['id', 'title', 'duration', 'artist_name', 'album_name'])
+        .distinct()
+        .execute();
+            
+      res.json({result: files});
     } catch(error){
-        console.log("error: ", error);
-        res.status(500);
+      console.log("error: ", error);
+      res.status(500);
     }
-})
+  });
 
-app.get('/stream-mp3/:mp3Id', async (req, res) => {
+  app.get('/stream-mp3/:mp3Id', async (req, res) => {
     try {
-        const mp3Id = +req.params.mp3Id;
-        const file = await AppDataSource.getRepository(MP3View).findOne({
+      const mp3Id = +req.params.mp3Id;
+      const file = await connection.getRepository(MP3View).findOne({
         select: {
-            filepath: true
+          filepath: true
         },
         where: {
-            id: mp3Id,
+          id: mp3Id,
         }});
-        const mp3FilePath = file.filepath;
-        res.set('Content-Type', 'audio/mpeg');
-        res.sendFile(mp3FilePath);
+      const mp3FilePath = file.filepath;
+      res.set('Content-Type', 'audio/mpeg');
+      res.sendFile(mp3FilePath);
     } catch(error) {
-        console.log("error", error);
-        res.status(500);
+      console.log("error", error);
+      res.status(500);
     }
-});
+  });
 
-app.listen(port, () => {
+  app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
+  });
 });

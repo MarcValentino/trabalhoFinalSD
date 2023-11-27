@@ -2,12 +2,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as mm from 'music-metadata';
 import { DataSource } from 'typeorm';
-import { MP3Metadata } from '../entity/MP3Metadata';
-import { Artist } from '../entity/Artist';
-import { Genre } from '../entity/Genre';
-import { Album } from '../entity/Album';
+import { Artist, Genre, MP3Metadata, Album } from '../entity';
 
-interface Mp3Metadata {
+interface MP3FileData {
   title?: string;
   artist?: string;
   album?: string;
@@ -26,7 +23,7 @@ export async function readMp3FolderAndSaveToDB(folderPath: string, connection: D
     try {
       const metadata = await mm.parseFile(filePath, { duration: true });
 
-      const mp3Metadata: Mp3Metadata = {
+      const mp3Metadata: MP3FileData = {
         title: metadata.common.title ? metadata.common.title : 'untitled',
         artist: metadata.common.artist ? metadata.common.artist : 'unknown',
         album: metadata.common.album ? metadata.common.album : 'unknown',
@@ -35,7 +32,6 @@ export async function readMp3FolderAndSaveToDB(folderPath: string, connection: D
         filepath: filePath,
       };
 
-      // Save metadata to the database
       await saveMp3MetadataToDB(mp3Metadata, connection);
     } catch (error) {
       console.error(`Error reading metadata for file ${filePath}:`, error.message);
@@ -44,7 +40,7 @@ export async function readMp3FolderAndSaveToDB(folderPath: string, connection: D
   }
 }
 
-async function saveMp3MetadataToDB(metadata: Mp3Metadata, connection: DataSource): Promise<void> {
+async function saveMp3MetadataToDB(metadata: MP3FileData, connection: DataSource): Promise<void> {
   const mp3Repository = connection.getRepository(MP3Metadata);
   const artistRepository = connection.getRepository(Artist);
   const albumRepository = connection.getRepository(Album);
@@ -64,11 +60,3 @@ async function saveMp3MetadataToDB(metadata: Mp3Metadata, connection: DataSource
 
   await mp3Repository.save(mp3);
 }
-
-// Example usage
-// Uncomment the lines below to test the function
-
-// const folderPath = '/path/to/your/mp3/files';
-// readMp3FolderAndSaveToDB(folderPath)
-//   .then(() => console.log('Metadata saved to the database.'))
-//   .catch(error => console.error('Error:', error));

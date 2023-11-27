@@ -6,27 +6,27 @@ import { Genre } from './Genre';
 @Entity({name: 'mp3_metadata'})
 export class MP3Metadata {
   @PrimaryGeneratedColumn()
-  id: number;
+    id: number;
 
   @Column()
-  title: string;
+    title: string;
 
   @Column()
-  duration: number;
+    duration: number;
 
   @Column()
-  filepath: string;
+    filepath: string;
 
   @ManyToOne(() => Artist)
   @JoinColumn({ name: 'artist_id' })
-  artist: Artist;
+    artist: Artist;
 
   @ManyToOne(() => Album)
   @JoinColumn({ name: 'album_id' })
-  album: Album;
+    album: Album;
 
   @ManyToOne(() => Genre)
   @JoinColumn({ name: 'genre_id' })
-  genre: Genre;
+    genre: Genre;
 
 }
