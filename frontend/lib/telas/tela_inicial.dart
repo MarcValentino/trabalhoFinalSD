@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:musica_distribuida/modelos/musica.dart';
 import 'dart:convert';
 
 import 'package:musica_distribuida/telas/player.dart';
@@ -12,7 +13,14 @@ Future<List> pegar_musicas() async {
       await http.get(url, headers: {'Content-Type': 'application/json'});
   List musicas = [];
   if (response.statusCode == 200) {
-    musicas = json.decode(response.body)['result'];
+    List musicas_json = json.decode(response.body)['result'];
+    for (var musica_atual in musicas_json) {
+      Musica musica = Musica(
+          id: musica_atual['id'],
+          nome_musica: musica_atual['title'],
+          nome_artista: musica_atual['artist_name']);
+      musicas.add(musica);
+    }
   }
 
   return musicas;
@@ -45,13 +53,17 @@ class _TelaInicialState extends State<TelaInicial> {
               return ListView.builder(
                   itemCount: musicas.length,
                   itemBuilder: (context, index) {
-                    var id = musicas[index]['id'];
+                    var id = musicas[index].id;
                     return ListTile(
-                      title: Text("${musicas[index]['title']}",
+                      title: Text("${musicas[index].nome_musica}",
                           style: TextStyle(color: Colors.white)),
                       onTap: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => Player(id_musica: id,)));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Player(
+                                      musica: musicas[index],
+                                    )));
                       },
                     );
                   });
