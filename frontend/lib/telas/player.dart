@@ -1,7 +1,8 @@
-// ignore_for_file: non_constant_identifier_names, prefer_const_constructors_in_immutables, prefer_const_constructors
+// ignore_for_file: non_constant_identifier_names, prefer_const_constructors_in_immutables, prefer_const_constructors, use_build_context_synchronously
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:musica_distribuida/modelos/musica.dart';
+import '../modelos/musica.dart';
+import 'tela_inicial.dart';
 
 class Player extends StatefulWidget {
   Musica musica;
@@ -40,8 +41,18 @@ class _PlayerState extends State<Player> {
   Widget build(BuildContext context) {
     Musica musica = widget.musica;
     return Scaffold(
+      backgroundColor: Colors.black,
         appBar: AppBar(
-          title: Text("DistribuSound"),
+          backgroundColor: Colors.black,
+          title: Text('DistribuSound', style: TextStyle(color: Colors.white)),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.white,),
+            onPressed: () async {
+              // Adicione sua ação personalizada aqui
+              await audioPlayer.pause();
+              Navigator.pop(context);
+            },
+          ),
         ),
         body: Padding(
           padding: EdgeInsets.all(20),
@@ -61,12 +72,13 @@ class _PlayerState extends State<Player> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
+                color: Colors.white
               ),
             ),
             const SizedBox(height: 4),
             Text(
               musica.nome_artista,
-              style: TextStyle(fontSize: 20),
+              style: TextStyle(fontSize: 20, color: Colors.white),
             ),
             Slider(
                 min: 0,
@@ -82,8 +94,8 @@ class _PlayerState extends State<Player> {
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(formatDuration(position.toString())),
-                    Text(formatDuration((duration - position).toString())),
+                    Text(formatDuration(position.toString()), style: TextStyle(color: Colors.white,)),
+                    Text(formatDuration((duration - position).toString()), style: TextStyle(color: Colors.white,)),
                   ]),
             ),
             CircleAvatar(
