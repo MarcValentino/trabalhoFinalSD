@@ -24,6 +24,18 @@ class _PlayerState extends State<Player> {
       setState(() {
         isPlaying = state == PlayerState.playing;
       });
+
+      audioPlayer.onDurationChanged.listen((newDuration) {
+        setState(() {
+          duration = newDuration;
+        });
+      });
+
+      audioPlayer.onPositionChanged.listen((newPosition) {
+        setState(() {
+          position = newPosition;
+        });
+      });
     });
   }
 
@@ -39,7 +51,7 @@ class _PlayerState extends State<Player> {
             ClipRRect(
               borderRadius: BorderRadius.circular(20),
               child: Image.network(
-                'http://189.122.191.53:3000/stream-mp3/1',
+                'https://viacolor.com.br/public/getModelSizeCoverImage/core/2000/2000/core-4912-44266?v=3',
                 width: double.infinity,
                 height: 350,
                 fit: BoxFit.cover,
@@ -81,8 +93,12 @@ class _PlayerState extends State<Player> {
                   if (isPlaying) {
                     await audioPlayer.pause();
                   } else {
-                    await audioPlayer.play(
-                        UrlSource("http://189.122.191.53:3000/stream-mp3/1"));
+                    try {
+                      await audioPlayer.play(
+                          UrlSource("http://189.122.191.53:3000/stream-mp3/1"));
+                    } catch (e) {
+                      print("Erro ao reproduzir áudio: $e");
+                    }
                   }
                 },
               ),
