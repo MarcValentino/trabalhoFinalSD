@@ -53,7 +53,6 @@ class _TelaInicialState extends State<TelaInicial> {
               return ListView.builder(
                   itemCount: musicas.length,
                   itemBuilder: (context, index) {
-                    var id = musicas[index].id;
                     return ListTile(
                       title: Text("${musicas[index].nome_musica}",
                           style: TextStyle(color: Colors.white)),
